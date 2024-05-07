@@ -3,9 +3,6 @@ import markdown
 import glob
 
 
-DEFAULT_TEMPLATE_FILE = "templates/default.html"
-
-
 def read_template(template_file):
     with open(template_file, "r") as f:
         return f.read()
@@ -37,6 +34,8 @@ def create_index(index_dir):
 
 
 if __name__ == "__main__":
+
+    DEFAULT_TEMPLATE_FILE = read_template("templates/default.html")
     convert_file("public/index.md", "public")
     md_posts = glob.glob("public/posts/*.md")
     for f in md_posts:
