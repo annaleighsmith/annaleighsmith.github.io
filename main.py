@@ -1,23 +1,17 @@
 import os
 import markdown
+import glob
 
 
-# Define HTML template
-HTML_TEMPLATE = """
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>My Great Site</title>
-</head>
-<body>
-{}
-</body>
-</html>
-"""
+DEFAULT_TEMPLATE_FILE = "templates/default.html"
 
 
-def convert_file(md_file, output_dir="public"):
+def read_template(template_file):
+    with open(template_file, "r") as f:
+        return f.read()
+
+
+def convert_file(md_file, output_dir):
     with open(md_file, "r") as f:
         raw_md = f.read()
 
@@ -26,9 +20,26 @@ def convert_file(md_file, output_dir="public"):
     output_file = os.path.join(output_dir, file_name)
     print(output_file)
     with open(output_file, "w") as f:
-        f.write(HTML_TEMPLATE.format(html_content))
+        f.write(DEFAULT_TEMPLATE_FILE.format(html_content))
 
     return output_file
 
 
-convert_file("index.md", "")
+def create_index(index_dir):
+    md_files = glob.glob(f"{index_dir}/*.md")
+    index_content = "<h1>Index</h1>"
+    for md_file in md_files:
+        file_name = os.path.splitext(os.path.basename(md_file))[0]
+        index_content += f'<a href="{file_name}.html">{file_name}</a><br>'
+
+    with open(os.path.join(index_dir, "index.html"), "w") as f:
+        f.write(DEFAULT_TEMPLATE_FILE.format(index_content))
+
+
+if __name__ == "__main__":
+    convert_file("public/index.md", "public")
+    md_posts = glob.glob("public/posts/*.md")
+    for f in md_posts:
+        convert_file(f, "public/posts/")
+    create_index("public/posts")
+    create_index("public")

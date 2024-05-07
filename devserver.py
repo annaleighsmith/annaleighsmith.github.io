@@ -1,17 +1,20 @@
 import http.server
 import socketserver
+import os
+import sys
 
-PORT = 8000  # You can change this to any available port you prefer
+PORT = 8000
+PUBLIC_DIR = "public"
 
+os.chdir(PUBLIC_DIR)
 
-# Define the request handler
-class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory="public", **kwargs)
+Handler = http.server.SimpleHTTPRequestHandler
 
-
-# Create a socket server
-with socketserver.TCPServer(("", PORT), MyHTTPRequestHandler) as httpd:
-    print(f"Serving at port http://localhost:{PORT}")
-    # Start the server
-    httpd.serve_forever()
+with socketserver.TCPServer(("", PORT), Handler) as httpd:
+    print("Serving at port", PORT)
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\nServer stopped.")
+        httpd.shutdown()
+        sys.exit(0)
